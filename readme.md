@@ -2,7 +2,7 @@
 
 PYDUA is a python library that facilitates the emission, consult and generation PDF of the "Single Tax Revenues Document" of ES-Brazil .
 
-# Installing the pypix library
+# Installing the pydua library
 
 ```pip install git+https://github.com/cleitonleonel/pydua.git```
 
