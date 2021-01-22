@@ -172,11 +172,11 @@ class DuaAPI(Browser):
 
 if __name__ == '__main__':
     dua = DuaAPI()
-    dua.emit(amount="2,00", due_date="20/03/2021", cpf_cnpj="12345678909", description='2 Blocos de concreto')
-    print('GUARDE ESSE NÚMERO PARA CONSULTA POSTERIOR: ', dua.get_dua_number())
-    dua.get_pdf()
-    dua.consult(cpf_cnpj=12345678909, nr_dua=dua.get_dua_number())
-    # dua.get_pdf(template='3349968726-dua.html', nr_dua='3349968726', native=False)
+    # dua.emit(amount="2,00", due_date="20/03/2021", cpf_cnpj="12345678909", description='2 Blocos de concreto')
+    # print('GUARDE ESSE NÚMERO PARA CONSULTA POSTERIOR: ', dua.get_dua_number())
+    # dua.get_pdf()
+    # dua.consult(cpf_cnpj=12345678909, nr_dua=dua.get_dua_number())
+    dua.get_pdf(template='3350472976-dua.html', nr_dua='3350472976', native=False)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3349043900)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3348393517)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3348768340)

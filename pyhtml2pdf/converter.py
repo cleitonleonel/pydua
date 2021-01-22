@@ -1,6 +1,8 @@
+import os
 import json
 import base64
 import logging
+import shutil
 
 from selenium import webdriver
 from selenium.webdriver.remote.remote_connection import LOGGER
@@ -52,6 +54,15 @@ def __send_devtools(driver, cmd, params={}):
     return response.get('value')
 
 
+def manager_path_binary(binary_path):
+    new_binary = os.path.join('bin/', os.path.basename(binary_path))
+    shutil.copyfile(binary_path, new_binary)
+    os.chmod(new_binary, 0o755)
+    shutil.rmtree('bin/drivers')
+    os.remove('bin/drivers.json')
+    return new_binary
+
+
 def __get_pdf_from_html(driver_path: str, path: str, timeout: int, install_driver: bool, print_options={}):
     webdriver_options = Options()
     webdriver_prefs = {}
@@ -66,9 +77,17 @@ def __get_pdf_from_html(driver_path: str, path: str, timeout: int, install_drive
     webdriver_prefs['profile.default_content_settings'] = {'images': 2}
 
     if install_driver:
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=webdriver_options)
+        ChromeDriverManager(path='bin').install()
+        binary = manager_path_binary()
+        driver = webdriver.Chrome(binary, options=webdriver_options)
     else:
-        driver = webdriver.Chrome(driver_path, options=webdriver_options)
+        try:
+            driver = webdriver.Chrome(driver_path, options=webdriver_options)
+        except:
+            download_path = ChromeDriverManager(path='bin').install()
+            binary = manager_path_binary(download_path)
+            driver = webdriver.Chrome(binary, options=webdriver_options)
+
 
     driver.get(path)
 

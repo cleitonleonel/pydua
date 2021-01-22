@@ -74,7 +74,6 @@ class ChromePDF(object):
 
     def print_to_pdf(self, url, output_file):
         """
-
         :param url:
         :param output_file:
         :return:
