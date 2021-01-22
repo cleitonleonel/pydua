@@ -1,3 +1,4 @@
+from pyhtml2pdf import converter
 import subprocess
 import tempfile
 import sys
@@ -10,7 +11,7 @@ class ChromePDF(object):
         '--no-margins',
     ]
 
-    def __init__(self, chrome_exec, sandbox=True):
+    def __init__(self, chrome_exec=None, driver_path='bin/chromedriver', sandbox=True):
         """
         Constructor
         chrome_exec (string) - path to chrome executable
@@ -19,9 +20,10 @@ class ChromePDF(object):
         assert isinstance(chrome_exec, str) and chrome_exec != ''
 
         self._chrome_exe = chrome_exec
+        self._driver_path = driver_path
         self._sandbox = sandbox
 
-    def html_to_pdf(self, html_byte_string, output_file, raise_exception=False):
+    def html_string_to_pdf(self, html_byte_string, output_file, native=False, raise_exception=False):
         """
         Converts the given html_byte_string to PDF stored at output_file
 
@@ -39,13 +41,18 @@ class ChromePDF(object):
 
             temp_file_url = 'file://{0}'.format(html_file.name)
 
-            pdf = self.create_pdf(temp_file_url, output_file, raise_exception=raise_exception)
-            if not pdf:
-                return False
+            if native:
+                pdf = self.create_pdf(temp_file_url, output_file, raise_exception)
+                if not pdf:
+                    return False
+            else:
+                pdf = self.print_to_pdf(temp_file_url, output_file)
+                if not pdf:
+                    return False
 
         return True
 
-    def page_to_pdf(self, template, output_file, raise_exception=False):
+    def page_to_pdf(self, template, output_file, native=False, raise_exception=False):
         """
         Converts the given page_template to PDF stored at output_file
 
@@ -54,7 +61,25 @@ class ChromePDF(object):
 
         returns True if successful and False otherwise
         """
-        pdf = self.create_pdf(template, output_file, raise_exception)
+        if native:
+            pdf = self.create_pdf(template, output_file, raise_exception)
+            if not pdf:
+                return False
+        else:
+            pdf = self.print_to_pdf(template, output_file)
+            if not pdf:
+                return False
+
+        return True
+
+    def print_to_pdf(self, url, output_file):
+        """
+
+        :param url:
+        :param output_file:
+        :return:
+        """
+        pdf = converter.convert(self._driver_path, url, output_file.name)
         if not pdf:
             return False
 
@@ -74,14 +99,12 @@ class ChromePDF(object):
         )
 
         isNotWindows = not sys.platform.startswith('win32')
-        # print(print_to_pdf_command)
         try:
             result = ''
             while 'Written to file' not in result:
                 command = subprocess.run(print_to_pdf_command, shell=isNotWindows, check=True, capture_output=True)
                 result = command.stderr.decode().split(']')[1]
                 if 'Written to file' in result:
-                    # print(result)
                     break
         except subprocess.CalledProcessError:
             if raise_exception:

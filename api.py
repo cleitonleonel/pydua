@@ -16,10 +16,12 @@ BASE_DIR = os.getcwd()
 
 if sys.platform.startswith('win32'):
     system = 'Windows'
-    PATH_TO_CHROME_EXE = r'C:\Program~1\Google\Chrome\Application\chrome.exe'
+    PATH_TO_CHROME_EXE = r'C:\Progra~1\Google\Chrome\Application\chrome.exe'
+    DRIVER_PATH = 'bin/chromedriver.exe'
 elif sys.platform.startswith('linux'):
     system = 'Linux'
     PATH_TO_CHROME_EXE = '/usr/bin/google-chrome-stable'
+    DRIVER_PATH = 'bin/chromedriver'
 
 
 class Browser(object):
@@ -50,26 +52,26 @@ class DuaAPI(Browser):
         self.current_dua_number = None
         self.headers = self.headers()
 
-    def emit(self, amount, due_date, cpf_cnpj):
+    def emit(self, amount, due_date, cpf_cnpj, description=''):
         document_type = "CPF"
         if len(cpf_cnpj) == 14:
             document_type = "CNPJ"
 
         data = {
-            "txt_desc_orgao": "Secretaria de Estado da Justia",
-            "TXT_ORGAO": 23,
-            "txt_desc_area": "Recebimento de Convnios",
-            "TXT_AREA": 418,
-            "txt_desc_servico": "Pagamento do Fundo de Rotativo do Sstema Penitnciario - FRSP",
-            "TXT_SERVICO": 22576,
-            "txt_hdcdrec": 6173,
+            "txt_desc_orgao": "Fundo Rotativo do Sistema Penitenci&aacute;rio",  # "Secretaria de Estado da Justi&ccedil;a"
+            "TXT_ORGAO": 60,
+            "txt_desc_area": "Receitas Correntes",  # "Recebimento de Conv&ecirc;nios"
+            "TXT_AREA": 13,  # 418
+            "txt_desc_servico": "Comercializa&ccedil;&atilde;o de Produ&ccedil;&atilde;o Industrial - FRSP",  # "Pagamento do Fundo de Rotativo do Sistema Penitenci&aacute;rio - FRSP"
+            "TXT_SERVICO": 22571,  # 22576
+            "txt_hdcdrec": 1198,
             "txt_cdmunicip": 56251,
             "txt_seqmunic": 0o17,
             "TXT_NRDOCDEB": 000000000000,
             "txt_DTEMISSAO": date.today().strftime("%d/%m/%Y"),
             "txt_HREMISSAO": datetime.now().strftime('%H:%M:%S'),
             "TXT_REFERENCIA": "",
-            "TXT_INFO_COMPLEMENTARES": "",
+            "TXT_INFO_COMPLEMENTARES": description,
             "TXT_VENCIMENTO": due_date,
             "TXT_VLTRIB": amount,
             "TXT_VLMULTA": 000000000000,
@@ -137,13 +139,13 @@ class DuaAPI(Browser):
         res_dct = {data_list[i]: data_list[i + 1] for i in range(0, len(data_list) - 1, 2)}
         return res_dct
 
-    def get_pdf(self, template=None, nr_dua=None):
-        cpdf = ChromePDF(PATH_TO_CHROME_EXE, sandbox=False)
+    def get_pdf(self, template=None, nr_dua=None, native=False):
+        cpdf = ChromePDF(PATH_TO_CHROME_EXE, DRIVER_PATH, sandbox=False)
 
         if not template:
             template = self.response.text
         else:
-            with open(template, 'r') as template_file:
+            with open(template, 'r', encoding='utf-8') as template_file:
                 template = template_file.read()
 
         if not nr_dua:
@@ -152,29 +154,29 @@ class DuaAPI(Browser):
             self.current_dua_number = nr_dua
             soup_template = template
 
-        with open(f'{self.current_dua_number}-dua.html', 'w') as html_file:
+        with open(f'{self.current_dua_number}-dua.html', 'w', encoding='utf-8') as html_file:
             html_file.write(str(soup_template).replace('<html><head>', '<html>\n<head>\n  <base href="https://e-dua.sefaz.es.gov.br">'))
 
-        with open(f'{self.current_dua_number}-dua.html', 'r') as html_file_string:
+        with open(f'{self.current_dua_number}-dua.html', 'r', encoding='utf-8') as html_file_string:
             html_byte_string = html_file_string.read()
 
         pdf_path = f'{BASE_DIR}/{self.current_dua_number}-{file_name}.pdf'
         with open(pdf_path, 'wb') as output_file:
             if system == 'Windows':
-                cpdf.page_to_pdf(f'{BASE_DIR}/{html_file.name}', output_file)
+                cpdf.page_to_pdf(f'{BASE_DIR}/{html_file.name}', output_file, native=native)
             else:
-                cpdf.html_to_pdf(html_byte_string, output_file)
+                cpdf.html_string_to_pdf(html_byte_string, output_file, native=native)
 
         return pdf_path
 
 
 if __name__ == '__main__':
     dua = DuaAPI()
-    dua.emit(amount="2,00", due_date="20/03/2021", cpf_cnpj="12345678909")
+    dua.emit(amount="2,00", due_date="20/03/2021", cpf_cnpj="12345678909", description='2 Blocos de concreto')
     print('GUARDE ESSE NÚMERO PARA CONSULTA POSTERIOR: ', dua.get_dua_number())
     dua.get_pdf()
     dua.consult(cpf_cnpj=12345678909, nr_dua=dua.get_dua_number())
-    # dua.get_pdf(template='3349836498-dua.html', nr_dua='3349836498')
+    # dua.get_pdf(template='3349968726-dua.html', nr_dua='3349968726', native=False)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3349043900)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3348393517)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3348768340)
