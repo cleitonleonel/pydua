@@ -81,7 +81,7 @@ class ChromePDF(object):
                 command = subprocess.run(print_to_pdf_command, shell=isNotWindows, check=True, capture_output=True)
                 result = command.stderr.decode().split(']')[1]
                 if 'Written to file' in result:
-                    print(result)
+                    # print(result)
                     break
         except subprocess.CalledProcessError:
             if raise_exception:

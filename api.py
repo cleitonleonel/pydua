@@ -140,8 +140,6 @@ class DuaAPI(Browser):
     def get_pdf(self, template=None, nr_dua=None):
         cpdf = ChromePDF(PATH_TO_CHROME_EXE, sandbox=False)
 
-        if nr_dua:
-            self.current_dua_number = nr_dua
         if not template:
             template = self.response.text
         else:
@@ -151,14 +149,21 @@ class DuaAPI(Browser):
         if not nr_dua:
             soup_template = BeautifulSoup(str(template).replace('alert', '//alert'), "html5lib")
         else:
+            self.current_dua_number = nr_dua
             soup_template = template
 
         with open(f'{self.current_dua_number}-dua.html', 'w') as html_file:
             html_file.write(str(soup_template).replace('<html><head>', '<html>\n<head>\n  <base href="https://e-dua.sefaz.es.gov.br">'))
 
+        with open(f'{self.current_dua_number}-dua.html', 'r') as html_file_string:
+            html_byte_string = html_file_string.read()
+
         pdf_path = f'{BASE_DIR}/{self.current_dua_number}-{file_name}.pdf'
         with open(pdf_path, 'wb') as output_file:
-            cpdf.page_to_pdf(html_file.name, output_file)
+            if system == 'Windows':
+                cpdf.page_to_pdf(f'{BASE_DIR}/{html_file.name}', output_file)
+            else:
+                cpdf.html_to_pdf(html_byte_string, output_file)
 
         return pdf_path
 
@@ -168,7 +173,9 @@ if __name__ == '__main__':
     dua.emit(amount="2,00", due_date="20/03/2021", cpf_cnpj="12345678909")
     print('GUARDE ESSE NÚMERO PARA CONSULTA POSTERIOR: ', dua.get_dua_number())
     dua.get_pdf()
-    # dua.get_pdf(template='3349043900-dua.html', nr_dua='3349043900')
+    dua.consult(cpf_cnpj=12345678909, nr_dua=dua.get_dua_number())
+    # dua.get_pdf(template='3349836498-dua.html', nr_dua='3349836498')
+    # dua.consult(cpf_cnpj=12345678909, nr_dua=3349043900)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3348393517)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3348768340)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3348804916)
