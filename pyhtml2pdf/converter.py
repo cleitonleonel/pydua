@@ -77,8 +77,8 @@ def __get_pdf_from_html(driver_path: str, path: str, timeout: int, install_drive
     webdriver_prefs['profile.default_content_settings'] = {'images': 2}
 
     if install_driver:
-        ChromeDriverManager(path='bin').install()
-        binary = manager_path_binary()
+        download_path = ChromeDriverManager(path='bin').install()
+        binary = manager_path_binary(download_path)
         driver = webdriver.Chrome(binary, options=webdriver_options)
     else:
         try:
