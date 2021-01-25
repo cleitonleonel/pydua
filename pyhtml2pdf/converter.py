@@ -6,8 +6,10 @@ import shutil
 
 from selenium import webdriver
 from selenium.webdriver.remote.remote_connection import LOGGER
+
 LOGGER.setLevel(logging.WARNING)
 from urllib3.connectionpool import log
+
 log.setLevel(logging.WARNING)
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
@@ -87,7 +89,6 @@ def __get_pdf_from_html(driver_path: str, path: str, timeout: int, install_drive
             download_path = ChromeDriverManager(path='bin').install()
             binary = manager_path_binary(download_path)
             driver = webdriver.Chrome(binary, options=webdriver_options)
-
 
     driver.get(path)
 
