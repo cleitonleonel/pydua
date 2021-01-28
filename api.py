@@ -518,16 +518,16 @@ class DuaAPI(Browser):
             self.current_dua_number = nr_dua
             soup_template = template
 
-        with open(f'{self.current_dua_number}-dua.html', 'w', encoding='utf-8') as html_file:
+        with open(f'{self.current_dua_number}-{file_name}.html', 'w', encoding='utf-8') as html_file:
             html_file.write(str(soup_template).replace('<html><head>', '<html>\n<head>\n  <base href="https://e-dua.sefaz.es.gov.br">'))
 
-        with open(f'{self.current_dua_number}-dua.html', 'r', encoding='utf-8') as html_file_string:
+        with open(f'{self.current_dua_number}-{file_name}.html', 'r', encoding='utf-8') as html_file_string:
             html_byte_string = html_file_string.read()
 
         pdf_path = f'{BASE_DIR}/{self.current_dua_number}-{file_name}.pdf'
         with open(pdf_path, 'wb') as output_file:
             if system == 'Windows':
-                cpdf.page_to_pdf(f'{BASE_DIR}/{html_file.name}', output_file, native=native)
+                cpdf.page_to_pdf(f'{BASE_DIR}/{self.current_dua_number}-{file_name}.html', output_file, native=native)
             else:
                 cpdf.html_string_to_pdf(html_byte_string, output_file, native=native)
 
@@ -536,20 +536,21 @@ class DuaAPI(Browser):
 
 if __name__ == '__main__':
     dua = DuaAPI()
-
+    """
     dua.emit(
-        amount="2,00",
-        due_date="20/03/2021",
-        cpf_cnpj="12345678909",
+        amount="5,00",
+        due_date="27/01/2021",
+        cpf_cnpj="52720411787",
         city_name='Cariacica',
         revenue_desc='Comercialização de Produção Industrial - FRSP',
-        description='2 Blocos de concreto'
+        description='Teste de emissão de DUA eletrônico'
     )
 
     print('GUARDE ESSE NÚMERO PARA CONSULTA POSTERIOR: ', dua.get_dua_number())
 
     dua.get_pdf()
-    dua.consult(cpf_cnpj=12345678909, nr_dua=dua.get_dua_number())
+    dua.consult(cpf_cnpj=52720411787, nr_dua=dua.get_dua_number())
+    """
 
     # dua.get_pdf(template='3350472976-dua.html', nr_dua='3350472976', native=False)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3350472976)
@@ -563,3 +564,5 @@ if __name__ == '__main__':
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3348804916)
     # json_data = dua.consult(cpf_cnpj=12345678909, nr_dua=3348822906)
     # print(json_data)
+    # dua.consult(cpf_cnpj=52720411787, nr_dua=3353356594)
+    dua.get_pdf(template='3353356594-dua.html', nr_dua='3353356594', native=True)

@@ -12,7 +12,14 @@ PYDUA is a python library that facilitates the emission, consult and generation 
 from api import DuaAPI
 
 dua = DuaAPI()
-emit = dua.emit(amount="2,00", due_date="20/03/2021", cpf_cnpj="12345678909")
+dua.emit(
+    amount="2,00",
+    due_date="27/01/2021",
+    cpf_cnpj="12345678909",
+    city_name='Cariacica',
+    revenue_desc='Comercialização de Produção Industrial - FRSP',
+    description='Teste de emissão de DUA eletrônico'
+)
 number = dua.get_dua_number()
 consult = dua.consult(cpf_cnpj=12345678909, nr_dua=number)
 pdf = dua.get_pdf()

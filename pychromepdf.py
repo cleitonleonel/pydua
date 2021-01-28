@@ -96,7 +96,6 @@ class ChromePDF(object):
         print_to_pdf_command = self.generate_shell_command(
             self._chrome_exe, url, output_file.name, self._sandbox,
         )
-
         isNotWindows = not sys.platform.startswith('win32')
         try:
             result = ''
