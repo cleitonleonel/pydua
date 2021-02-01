@@ -536,11 +536,11 @@ class DuaAPI(Browser):
 
 if __name__ == '__main__':
     dua = DuaAPI()
-    """
+
     dua.emit(
         amount="5,00",
-        due_date="27/01/2021",
-        cpf_cnpj="52720411787",
+        due_date="05/02/2021",
+        cpf_cnpj="12345678909",
         city_name='Cariacica',
         revenue_desc='Comercialização de Produção Industrial - FRSP',
         description='Teste de emissão de DUA eletrônico'
@@ -549,8 +549,7 @@ if __name__ == '__main__':
     print('GUARDE ESSE NÚMERO PARA CONSULTA POSTERIOR: ', dua.get_dua_number())
 
     dua.get_pdf()
-    dua.consult(cpf_cnpj=52720411787, nr_dua=dua.get_dua_number())
-    """
+    dua.consult(cpf_cnpj=12345678909, nr_dua=dua.get_dua_number())
 
     # dua.get_pdf(template='3350472976-dua.html', nr_dua='3350472976', native=False)
     # dua.consult(cpf_cnpj=12345678909, nr_dua=3350472976)
@@ -565,4 +564,4 @@ if __name__ == '__main__':
     # json_data = dua.consult(cpf_cnpj=12345678909, nr_dua=3348822906)
     # print(json_data)
     # dua.consult(cpf_cnpj=52720411787, nr_dua=3353356594)
-    dua.get_pdf(template='3353356594-dua.html', nr_dua='3353356594', native=True)
+    # dua.get_pdf(template='3353356594-dua.html', nr_dua='3353356594', native=True)
